@@ -1,0 +1,156 @@
+---
+title: "Class06Hw"
+format: pdf
+editor: visual
+---
+
+Example input vectors to start with 
+
+```{r}
+student1 <- c(100, 100, 100, 100, 100, 100, 100, 90)
+student2 <- c(100, NA, 90, 90, 90, 90, 97, 80)
+student3 <- c(90, NA, NA, NA, NA, NA, NA, NA)
+```
+
+Average grade for student 1.
+```{r}
+mean(student1)
+```
+
+
+Average grade for student 2. 
+`is.na()` function is used to convert all *NA* inputs of student 2 grades into 0
+```{r}
+student2[is.na(student2)] <- 0
+student2
+mean(student2)
+```
+
+Average grade for student 3
+`is.na()` function is used to convert all *NA* inputs of student 2 grades into 0
+```{r}
+student3[is.na(student3)] <- 0
+student3
+mean(student3)
+```
+
+Q1. Average grade with lowest score dropped for student 1. I can use the minus sign together with `which.min()` to exclude the lowest value: 
+```{r}
+student1
+which.min(student1)
+student1[ - which.min(student1)]
+```
+
+
+Now I need to put this all back together to make our working snippet: 
+```{r}
+
+#Map/Replace NA values to zero
+student3 [ is.na(student3) ]  <- 0 
+#Exclude the lowest score
+student3 [ -which.min(student3)]
+# Calculate the mean
+mean(student3[ -which.min(student3)] )
+
+
+```
+
+
+This is my working snippet that I can turn into a function called `grade()`
+
+All function in R have at leat 3 things:
+- **Name**, in our case "grade"
+- Input **arguments**, student 1 etc.
+- **Body**, this is our working snippet above. 
+
+```{r}
+grade <- function(y) {
+    #Map/Replace NA values to zero
+    y [ is.na(y) ]  <- 0 
+    #Exclude the lowest score
+    y [ -which.min(y)]
+    # Calculate the mean
+    mean(y[ -which.min(y)] )
+}
+
+```
+
+Using the function to get student 1 grade:
+```{r}
+grade(student1)
+```
+
+
+Read a gradebook from online
+```{r}
+hw <- read.csv("https://tinyurl.com/gradeinput", row.names=1)
+hw
+```
+
+
+> Q1. Write a function grade() to determine an overall grade from a vector of student homework assignment scores dropping the lowest single score.
+
+The `apply` functions allows us to run any function over the rows or columns of data.frame. 
+```{r}
+ans <- apply(hw, 1, grade)
+ans
+```
+
+
+> Q2. Using your grade() function and the supplied gradebook, who is the top scoring student overall in the gradebook? 
+
+```{r}
+ans [ which.max(ans) ]
+```
+
+
+> Q3. From your analysis of the gradebook, which homework was toughest on students?
+
+```{r}
+which.min( apply (hw, 2, sum, na.rm=TRUE) )
+```
+Hw 2 seems to gave been the toughest for students.
+
+
+
+> Q4. Optional Extension: From your analysis of the gradebook, which homework was most
+predictive of overall score (i.e. highest correlation with average grade score)?
+
+```{r}
+hw$hw1
+```
+
+```{r}
+ans
+```
+
+```{r}
+cor(hw$hw1, ans)
+cor(hw$hw3, ans)
+```
+
+Changing NA values in homework assignments to 0.
+```{r}
+mask <- hw 
+mask [ is.na(mask)] <- 0
+mask 
+```
+
+```{r}
+cor(mask$hw5, ans)
+```
+
+
+```{r}
+  apply(mask, 2, cor, y=ans)
+```
+
+
+
+
+
+
+
+
+
+
